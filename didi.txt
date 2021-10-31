@@ -1,0 +1,76 @@
+function sysCall_init()
+-- do some initialization here
+
+    motor1 = sim.getObjectHandle('Joint1')
+    motor2 = sim.getObjectHandle('Joint2')
+    motor3 = sim.getObjectHandle('Joint3')
+    i = 0
+    curr_time = 0  
+    
+end
+
+function sysCall_actuation()
+        
+    m_orientasi_0 = 0 -- inisial orientasi
+    m_orientasi_1 = 15    --orientasi yang dituju
+    m_a1 = 0.300        --panjang link 1
+    m_a2 = 0.250        --panjang link 2
+    m_a3 = 0.150        --panjang link 3
+
+    m_i = 1
+    m_n = 4
+
+    --posisi awal
+    m_qx_0 = 0.0
+    m_qy_0 = 0.0
+    
+    m_qx_1 = 0.2 --posisi x yang dituju
+    m_qy_1 = 0.1 --posisi x yang dituju
+
+    m_qx = m_qx_0 + ((m_qx_1-m_qx_0)/(m_n)*i)
+    m_qy = m_qy_0 + ((m_qy_1-m_qy_0)/(m_n)*i)
+    orientasi = m_orientasi_0 + ((m_orientasi_1-m_orientasi_0)/m_n*i)
+
+    m_px = m_qx - m_a3*math.cos(orientasi*3.14/180)
+    m_py = m_qy - m_a3*math.sin(orientasi*3.14/180)
+
+    teta2 = (m_px*m_px + m_py*m_py - m_a1*m_a1 - m_a2*m_a2 )/(2*m_a1*m_a2)
+
+  --  if(teta2>1.0)
+   --     then teta2 = 1.0
+  --  end
+  --  if(teta2 <=-1.0)
+  --      then teta2 = 1.0
+ --   end
+    
+    teta2 = math.acos(teta2)
+    teta1 = (m_a2 *math.sin(teta2))/(m_a1+m_a2*math.cos(teta2))
+    teta1 = math.atan(m_py/m_px) - math.atan(teta1)
+
+    m_dua = teta2*(180/math.pi)
+    m_satu = teta1*(180/math.pi)
+    m_tiga = orientasi - m_dua - m_satu
+    teta3 = m_tiga*(math.pi/180)
+
+    if (i>m_n)
+    then i = m_n
+    end
+
+    sim.setJointTargetPosition(motor1, teta1)
+    sim.setJointTargetPosition(motor2, teta2)
+    sim.setJointTargetPosition(motor3, teta3)
+
+    if(curr_time==0)
+       then curr_time=os.time()
+    end
+            
+    if(os.time()-curr_time==2)
+      then 
+      i = m_i+i
+      curr_time = os.time()
+    end
+
+    print(m_satu,m_dua,m_tiga)
+    print("i = ",i)
+    
+end
