@@ -1,0 +1,50 @@
+function sysCall_init()
+    -- do some initialization here
+    motor1 = sim.getObjectHandle('joint_kiri')
+    motor2 = sim.getObjectHandle('joint_kanan')
+    x1=1
+    x2=1
+end
+
+function sysCall_actuation()
+    -- put your actuation code here
+    
+    --wheelbase & R roda di cm
+    R = 7.0
+    D = 10.5
+    -- all V below in cm/s
+    
+    --forward kin.
+    wr = 0.5
+    wl = 0.75
+    
+    VLin = (R/2)*(wr+wl)
+    VOri = (R/2*D)*(wr-wl)
+    
+    print("V Linear = ", VLin)
+    print("V Orientation = ", VOri)
+    
+    --inverse kin.
+    --VLin = 8
+    --VOri = 0.05
+    
+    --wr = VLin/R + (D/R)*VOri
+    --wl = VLin/R - (D/R)*VOri
+    
+    --print("wr = ", wr)
+    --print("wl = ", wl)
+    
+    sim.setJointTargetVelocity(motor1,wr)
+    sim.setJointTargetVelocity(motor2,-wl)
+    
+end
+
+function sysCall_sensing()
+    -- put your sensing code here
+end
+
+function sysCall_cleanup()
+    -- do some clean-up here
+end
+
+-- See the user manual or the available code snippets for additional callback functions and details
