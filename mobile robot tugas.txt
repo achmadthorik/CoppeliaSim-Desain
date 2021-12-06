@@ -1,0 +1,119 @@
+function sysCall_init()
+    -- do some initialization here
+    motor1 = sim.getObjectHandle('joint_kiri')
+    motor2 = sim.getObjectHandle('joint_kanan')
+    x1=1
+    x2=1
+    --wheelbase & R roda di cm
+    R = 7.0
+    D = 10.5
+    --timer
+    curr_time = 0
+end
+
+function fwd_kin(wr, wl)
+
+    VLin = (R/2)*(wr+wl)
+    VOri = (R/2*D)*(wr-wl)
+
+    print("V Linear = ", VLin)
+    print("V Orientation = ", VOri)
+
+    sim.setJointTargetVelocity(motor1,wr)
+    sim.setJointTargetVelocity(motor2,-wl)
+
+end
+
+function inv_kin(VLin, VOri)
+    wr = VLin/R + (D/R)*VOri
+    wl = VLin/R - (D/R)*VOri
+    
+    print("wr = ", wr)
+    print("wl = ", wl)
+
+    sim.setJointTargetVelocity(motor1,wr)
+    sim.setJointTargetVelocity(motor2,-wl)
+
+end
+
+function fwd_map()
+
+if (curr_time == 0)
+then curr_time = os.time()
+end
+
+print("time = ", curr_time)
+if (os.time()-curr_time < 1)
+ then 
+    fwd_kin(1, 1)
+end
+
+if (os.time()-curr_time > 1)
+ then
+    fwd_kin(1,3)
+end
+
+if (os.time()-curr_time > 2)
+  then
+      fwd_kin(3,1)
+end
+
+if (os.time()-curr_time > 3)
+  then
+      fwd_kin(1,2)
+end
+
+if (os.time()-curr_time > 4)
+  then
+      fwd_kin(1,1)
+end
+
+end
+
+function inv_map()
+if (curr_time == 0)
+then curr_time = os.time()
+end
+
+print("time = ", curr_time)
+if (os.time()-curr_time < 1)
+ then 
+    inv_kin(12, 0.0)
+end
+
+if (os.time()-curr_time > 1)
+ then
+    inv_kin(12,0.5)
+end
+
+if (os.time()-curr_time > 2)
+  then
+      inv_kin(12,-1.25)
+end
+
+if (os.time()-curr_time > 3)
+  then
+      inv_kin(12,0.75)
+end
+
+if (os.time()-curr_time > 4)
+  then
+      inv_kin(12,0.0)
+end
+
+end
+
+function sysCall_actuation()
+    --fwd_map()
+    inv_map()
+end
+
+function sysCall_sensing()
+    -- put your sensing code here
+end
+
+function sysCall_cleanup()
+    -- do some clean-up here
+end
+
+-- See the user manual or the available code snippets for additional callback functions and details
